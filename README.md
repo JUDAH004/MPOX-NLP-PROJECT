@@ -1,207 +1,202 @@
- # NLP on Mpox Instagram Posts: Sentiment & Hate Speech Detection + Gradio Deployment
-## 📘 Overview
-This project combines Natural Language Processing (NLP), machine learning, and Gradio-based deployment to analyze user-generated Instagram content about Mpox (formerly Monkeypox). The study seeks to understand public sentiment and detect hate speech, enabling health communicators and researchers to track emotional trends and online toxicity during public health crises.
+# 🦠 Natural Language Processing of Mpox-Related Instagram Captions: Sentiment Analysis & Hate Speech Detection with Gradio Deployment
+## 🧾 Project Title
+Understanding Public Sentiment and Online Toxicity Around the Mpox Outbreak Using NLP Techniques on Instagram Data
 
-## 🗂️ Table of Contents
-1. Introduction
+## 📜 Executive Summary
+In this project, we leverage state-of-the-art Natural Language Processing (NLP) tools and machine learning algorithms to extract insights from a large-scale, multilingual Instagram dataset related to the global Mpox (formerly Monkeypox) outbreak. Our aim is twofold:
 
-2. Business Understanding
+To classify the emotional sentiment embedded in user-generated Instagram posts.
 
-3. Data Understanding
+To identify and flag hate speech, thereby helping public health stakeholders monitor and moderate digital discourse.
 
-4. Data Preparation
+Using this real-world dataset, we trained robust classification models and deployed an interactive, user-friendly web application powered by Gradio. The app offers real-time sentiment and toxicity predictions and visual explanations of model decisions using LIME (Local Interpretable Model-Agnostic Explanations).
 
-5. Modeling Approach
+## 📍 Table of Contents
+Background & Motivation
 
-6. Evaluation
+Business Understanding
 
-7. Interpretability with LIME
+Dataset Overview
 
-8. Gradio Deployment
+Data Exploration & Key Findings
 
-9. How to Use the App
+Data Preprocessing
 
-10. Key Insights
+Modeling Strategy
 
-11. Limitations & Future Work
+Evaluation & Metrics
 
-12. File Structure
+Model Interpretability with LIME
 
-13. Credits
+Gradio-Based Web Deployment
 
-## 1. 🌍 Introduction
-The Mpox outbreak demonstrated how misinformation, fear, and stigma spread on social media. Instagram, a highly visual and global platform, became a hotbed for both public expression and disinformation.
+User Guide for Web App
 
-This project addresses the need for automated systems that can:
+Insights & Recommendations
 
-Monitor emotional sentiment
+Limitations & Proposed Improvements
 
-Detect toxic or hateful language
+Project Architecture & File Structure
 
-Assist public health stakeholders in creating safer online spaces
+Credits
+
+## 1. 🧭 Background & Motivation
+The Mpox outbreak, which gained global attention in recent years, became a focal point for intense discourse on social media. As fear, misinformation, and stigma spread online, platforms such as Instagram transformed into arenas where both helpful and harmful content were shared at scale. Social listening using NLP offers public health authorities a means of systematically capturing the pulse of public opinion, emotional response, and toxicity—insights that are critical during global health emergencies.
 
 ## 2. 🎯 Business Understanding
-Project Objectives:
+The primary business problem is the lack of automated tools for monitoring public sentiment and online hate speech in real-time across social platforms. This project addresses this gap by:
 
-🧠 Detect emotional sentiments in Mpox-related Instagram posts:
-neutral, fear, joy, sadness, anger, surprise, disgust
+Classifying the emotional tone of Instagram posts using a 7-class sentiment model.
 
-🚨 Detect hate speech in the same content:
-Hateful or Non-Hateful
+Detecting hate speech to support content moderation and flag potentially harmful or stigmatizing language.
 
-Why It Matters:
+These tasks are not only technically challenging due to language ambiguity, sarcasm, and class imbalance but also socially significant given their implications for public well-being, crisis communication, and misinformation control.
 
-NGOs and health agencies can use these models to monitor online sentiment in real time.
+## 3. 📊 Dataset Overview
+Name: Mpox Instagram Dataset – Sentiment and Hate Analysis
 
-Identifying hate speech helps reduce stigma and protects vulnerable populations.
+Source: Kaggle Dataset by Sameep Vani
 
-Insights support policy development and crisis communication strategies.
+Records: 60,127 unique Instagram posts
 
-## 3. 📊 Data Understanding
-Source: Kaggle - Mpox Instagram Dataset
-Records: ~60,127
-Features:
+Languages: Over 50 languages present; English comprises 97% of data
 
-caption: Instagram text post (translated if needed)
+Attributes:
 
-label: Sentiment category
+caption: Translated Instagram post
 
-hate: Binary hate speech label
+label: Sentiment category (neutral, fear, joy, sadness, anger, surprise, disgust)
 
-language: Language of post
+hate: Binary indicator for hate speech (1 = hateful, 0 = non-hateful)
 
-Key Observations:
+language: Original language of the post
 
-97% of posts are in English, but over 50 languages represented
+## 4. 🔎 Data Exploration & Key Findings
+Key insights derived from our exploratory data analysis include:
 
-Only ~4.25% of posts are labeled as hateful → significant class imbalance
+Class Imbalance: Hate speech represents only 4.25% of the dataset, requiring careful handling during modeling.
 
-Average post length: ~547 characters
+Text Length Distribution: Posts ranged widely in length, averaging ~547 characters.
 
-Focus for This Project:
+Language Concentration: Though multilingual, 58,616 out of 60,127 posts were in English.
 
-Filtered to English, Finnish, and Spanish — top 3 languages
+Emotion Distribution: Dominant emotions were fear, sadness, and anger, reflecting public anxiety and distrust.
 
-## 4. 🧹 Data Preparation
-Text Preprocessing:
+We further limited our modeling scope to the top three languages—English, Finnish, and Spanish—to ensure consistency and quality during preprocessing and modeling.
 
-Lowercasing
+## 5. 🧼 Data Preprocessing
+The raw captions underwent several transformations:
 
-URL and emoji removal
+Lowercasing and punctuation removal
 
-Tokenization using spaCy
+Elimination of emojis and URLs
+
+Tokenization and lemmatization via spaCy
 
 Stopword removal
 
-Lemmatization
+Feature engineering using TF-IDF vectorization
 
-Vectorization:
+These steps ensured that the input data was clean, normalized, and meaningful for feature extraction and model training.
 
-TF-IDF (Term Frequency-Inverse Document Frequency) was used to convert cleaned text into feature vectors.
+## 6. ⚙️ Modeling Strategy
+We designed two separate pipelines:
 
-Handling Class Imbalance:
+A. Sentiment Classification
+Model: XGBoost (Gradient Boosted Trees)
 
-Stratified splits for train/test
+Classes: neutral, fear, joy, sadness, anger, surprise, disgust
 
-Evaluation with precision/recall to mitigate class skew
+Pipeline: TF-IDF Vectorizer → XGBoost Classifier
 
-## 5. 🤖 Modeling Approach
-Task 1: Sentiment Classification
-Model: XGBoost
+B. Hate Speech Detection
+Model: LightGBM (Histogram-Based Gradient Boosting)
 
-Inputs: TF-IDF vectors
+Classes: Hateful, Non-Hateful
 
-Outputs: Multiclass prediction (7 classes)
+Pipeline: TF-IDF Vectorizer → LightGBM Classifier
 
-Task 2: Hate Speech Detection
-Model: LightGBM
+## 7. 📏 Evaluation & Metrics
+Both models were evaluated using stratified train-test splits with metrics including:
 
-Inputs: TF-IDF vectors
+Accuracy
 
-Outputs: Binary classification (Hateful / Not)
+Precision
 
-## 6. 📏 Evaluation
-Task	Model	Accuracy	Precision	Recall	F1-Score
-Sentiment Analysis	XGBoost	>85%	High	High	High
-Hate Speech Detection	LightGBM	>90%	High	High	High
+Recall
 
-Confusion matrices, ROC curves, and classification reports are provided in the notebook.
+F1-Score
 
-## 7. 🔍 Interpretability with LIME
-To promote transparency, we used LIME (Local Interpretable Model-Agnostic Explanations) to visualize how each word influences model predictions.
+Confusion Matrix
+
+ROC-AUC (for binary classification)
+
+Model performance was satisfactory across tasks, with the hate speech model achieving over 90% accuracy and sentiment classification delivering robust results across all emotional classes.
+
+## 8. 🧠 Model Interpretability with LIME
+To ensure our models are transparent and trustworthy, we integrated LIME to visualize how specific words influenced predictions.
 
 For example:
 
-For a post like "They’re lying about the disease again!", LIME highlights "lying" and "disease" as key contributors to an angry or hateful label.
+A caption like “They are spreading lies about Mpox again!” highlighted "lies" and "again" as key drivers for both anger and hateful predictions.
 
-## 8. 🌐 Gradio Deployment
-Why Gradio?
+This level of explanation is crucial in sensitive domains like public health, where misclassification can have real-world implications.
 
-Simple Python interface for deploying ML models
+## 9. 🌍 Gradio-Based Web Deployment
+We deployed our models using Gradio, which offers a sleek, interactive web interface for real-time NLP prediction.
 
-Real-time interactivity with live predictions
+Key Deployment Features:
+Input: Text box for entering or pasting Instagram captions
 
-Embeds easily in websites or internal dashboards
+Prediction Type: Drop-down menu to select sentiment or hate speech classification
 
-Features:
+Output:
 
-Upload or type text
+Predicted class
+
+Class probabilities
+
+LIME visualization for interpretability
+
+## 10. 🖱 User Guide for Web App
+Open the Gradio application (locally or hosted).
+
+Paste any Mpox-related Instagram caption into the input box.
 
 Choose between:
 
-Sentiment classification (via XGBoost)
+Sentiment Analysis
 
-Hate speech detection (via LightGBM)
+Hate Speech Detection
 
-Outputs:
+View:
 
-Predicted label
+Predicted class
 
-Probabilities
+Probability breakdown
 
-LIME visualization of word impact
+Word cloud visualization (via LIME) showing what influenced the decision
 
-## 9. 🖱 How to Use the App
-Enter Instagram caption text (related to Mpox)
+## 11. 📌 Insights & Recommendations
+A significant portion of the public reaction to Mpox involved fear and sadness, indicating widespread uncertainty and vulnerability.
 
-Select prediction type:
+Hate speech, while not dominant, was still present and often used charged or stigmatizing language.
 
-"Sentiment Analysis"
+XGBoost and LightGBM, though relatively lightweight models, achieved excellent performance, making them suitable for deployment in low-resource environments.
 
-"Hate Speech Detection"
-
-View prediction output, including:
-
-The predicted class
-
-Probability distribution
-
-LIME explanation plot
-
-## 10. 📌 Key Insights
-Fear and sadness dominate emotional responses to Mpox.
-
-Hateful content, though sparse, contains emotionally charged language.
-
-Instagram can serve as a barometer for public health anxiety.
-
-Lightweight models like XGBoost and LightGBM are sufficient for high performance.
-
-## 11. ⚠️ Limitations & Future Work
+## 12. 🚧 Limitations & Proposed Improvements
 Current Limitations:
-Only uses text (no image analysis)
+Only textual content was analyzed — no image or hashtag analysis
 
-Multilingual posts were reduced to just 3 languages
+Restricted to top 3 languages, excluding valuable multilingual data
 
-No deep learning models used (e.g., BERT)
+Used classical ML models — no transformer-based models like BERT or RoBERTa
 
 Future Work:
-Expand to multilingual support using mBERT or XLM-R
+Fine-tune transformer models (e.g., multilingual BERT)
 
-Add image captioning or OCR from post images
+Expand dataset to include comments and hashtags
 
-Integrate toxicity scoring using APIs like PerspectiveAPI
+Incorporate image captioning or computer vision
 
-Deploy via Docker or HuggingFace Spaces
-
-
+Host the app on Hugging Face Spaces or Streamlit Cloud
